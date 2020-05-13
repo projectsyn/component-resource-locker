@@ -1,0 +1,3 @@
+parameters:
+  resource_locker:
+    namespace: syn-resource-locker
