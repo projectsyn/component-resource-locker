@@ -1,11 +1,21 @@
 parameters:
   kapitan:
+    dependencies:
+      - type: https
+        source: 'https://redhat-cop.github.io/resource-locker-operator/resource-locker-operator/resource-locker-operator-${resource_locker:charts:resource-locker-operator}.tgz'
+        unpack: true
+        output_path: dependencies/resource-locker/helmcharts
     compile:
       - input_paths:
           - resource-locker/component/app.jsonnet
         input_type: jsonnet
         output_path: apps/
-      - input_paths:
-          - resource-locker/component/main.jsonnet
-        input_type: jsonnet
-        output_path: resource-locker/
+      - output_path: resource-locker/01_resource_locker_operator_helmchart
+        input_type: helm
+        output_type: yaml
+        input_paths:
+          - resource-locker/helmcharts/resource-locker-operator
+        helm_values: {}
+        helm_params:
+          release_name: resource-locker-operator
+          namespace: '${resource_locker:namespace}'
