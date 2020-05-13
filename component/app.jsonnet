@@ -3,7 +3,7 @@ local inv = kap.inventory();
 local params = inv.parameters.synsights;
 local argocd = import 'lib/argocd.libjsonnet';
 
-local app = argocd.App('syn-resource-locker', params.namespace, secrets=true);
+local app = argocd.App('resource-locker', params.namespace, secrets=true);
 
 {
   'syn-resource-locker': app,
