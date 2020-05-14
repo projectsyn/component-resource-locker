@@ -1,3 +1,5 @@
 parameters:
   resource_locker:
     namespace: syn-resource-locker
+    charts:
+      resource-locker-operator: v0.1.2
