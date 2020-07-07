@@ -148,12 +148,12 @@ local Resource(obj) =
  * \return A list containing a ServiceAccount, RBAC rules and the
  *         ResourceLocker object
  */
-local Patch(targetobj, patchtemplate) =
+local Patch(targetobj, patchtemplate, patchstrategy="application/strategic-merge-patch+json") =
   local objdata = obj_data(targetobj);
   local rbac = rbac_objs(objdata, verbs=["get", "patch"]);
   local name = rl_obj_name(objdata);
   rbac.objs + [patch(name, rbac.serviceaccount.metadata.name,
-      std.prune(objdata), patchtemplate)];
+      std.prune(objdata), patchtemplate, patchstrategy)];
 
 
 {
