@@ -48,6 +48,14 @@ local patch(name, sa, targetobjref, patchtemplate, patchtype="application/strate
     }
   };
 
+local clusterRoleName(name) =
+  local prefix = namespace + '-';
+  local suffix = '-manager';
+  local maxLength = 63 - std.length(prefix) - std.length(suffix);
+  local nameLength = std.length(name);
+  local start = nameLength - std.min(maxLength, std.length(name));
+  prefix + std.substr(name, start, nameLength) + suffix;
+
 local rbac_objs(objdata, verbs=["create", "get", "update", "patch"]) =
   local dest_ns = objdata.namespace;
   local name = objdata.name;
@@ -59,7 +67,7 @@ local rbac_objs(objdata, verbs=["create", "get", "update", "patch"]) =
     },
   };
   // Create cluster role to get/list/watch resource kind
-  local rolename = namespace+"-"+name+"-manager";
+  local rolename = clusterRoleName(name);
   local resource = std.asciiLower(objdata.kind)+"s";
   local clusterrole = kube.ClusterRole(rolename) {
     rules+: [{
