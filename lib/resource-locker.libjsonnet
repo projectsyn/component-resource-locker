@@ -61,11 +61,12 @@ local rbac_objs(objdata, verbs=["create", "get", "update", "patch"]) =
   // Create cluster role to get/list/watch resource kind
   local rolename = namespace+"-"+name+"-manager";
   local resource = std.asciiLower(objdata.kind)+"s";
+  local clusterrole_extra_verbs = if dest_ns == null then verbs else [];
   local clusterrole = kube.ClusterRole(rolename) {
     rules+: [{
       apiGroups: [objdata.apigroup],
       resources: [resource],
-      verbs: ["list", "watch"]
+      verbs: std.setUnion(["list", "watch"], clusterrole_extra_verbs),
     }],
   };
   local clusterrolebinding = kube.ClusterRoleBinding(rolename) {
@@ -73,7 +74,7 @@ local rbac_objs(objdata, verbs=["create", "get", "update", "patch"]) =
     roleRef_: clusterrole,
   };
   // Create role in destination namespace to allow managing the resource kind
-  local role = kube.Role(rolename) {
+  local role = if dest_ns != null then kube.Role(rolename) {
     metadata+: {
       namespace: dest_ns,
     },
@@ -83,7 +84,7 @@ local rbac_objs(objdata, verbs=["create", "get", "update", "patch"]) =
       verbs: verbs,
     }],
   };
-  local rolebinding = kube.RoleBinding(rolename) {
+  local rolebinding = if dest_ns != null then kube.RoleBinding(rolename) {
     metadata+: {
       namespace: dest_ns,
     },
@@ -92,13 +93,13 @@ local rbac_objs(objdata, verbs=["create", "get", "update", "patch"]) =
   };
   {
     serviceaccount: serviceaccount,
-    objs: [
+    objs: std.prune([
       serviceaccount,
       clusterrole,
       clusterrolebinding,
       role,
       rolebinding
-    ],
+    ]),
   };
 
 local obj_data(obj) =
@@ -108,8 +109,14 @@ local obj_data(obj) =
     apigroup:: if apigrp == "v1" then "" else apigrp,
     kind: obj.kind,
     name: obj.metadata.name,
-    namespace: obj.metadata.namespace,
+    namespace: if std.objectHas(obj.metadata, 'namespace') then obj.metadata.namespace,
   };
+
+local rl_obj_name(objdata) =
+  if objdata.namespace != null then
+    "%(namespace)s-%(name)s" % objdata
+  else
+    objdata.name;
 
 /**
  * \brief Create a managed resource (similar to Espejo, but for single NS)
@@ -122,7 +129,8 @@ local obj_data(obj) =
 local Resource(obj) =
   local objdata = obj_data(obj);
   local rbac = rbac_objs(objdata);
-  rbac.objs + [resource("%(namespace)s-%(name)s" % objdata, rbac.serviceaccount.metadata.name, obj)];
+  local name = rl_obj_name(objdata);
+  rbac.objs + [resource(name, rbac.serviceaccount.metadata.name, obj)];
 
 /**
  * \brief Create a resource patch which the operator will continuously apply
@@ -143,7 +151,9 @@ local Resource(obj) =
 local Patch(targetobj, patchtemplate) =
   local objdata = obj_data(targetobj);
   local rbac = rbac_objs(objdata, verbs=["get", "patch"]);
-  rbac.objs + [patch("%(namespace)s-%(name)s-patch" % objdata, rbac.serviceaccount.metadata.name, objdata, patchtemplate)];
+  local name = rl_obj_name(objdata);
+  rbac.objs + [patch(name, rbac.serviceaccount.metadata.name,
+      std.prune(objdata), patchtemplate)];
 
 
 {
