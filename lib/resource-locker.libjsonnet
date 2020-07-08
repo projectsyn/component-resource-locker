@@ -3,9 +3,9 @@
  * \brief methods to create resource-locker-operator resource and patch objects
  */
 
+local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
-local com = import 'lib/commodore.libjsonnet';
 local inv = kap.inventory();
 local resource_locker_params = inv.parameters.resource_locker;
 local namespace = resource_locker_params.namespace;
@@ -28,24 +28,24 @@ local resource(name, sa, obj) =
     spec+: {
       resources: [{
         excludedPaths: [
-          ".metadata",
-          ".status",
-          ".spec.replicas",
+          '.metadata',
+          '.status',
+          '.spec.replicas',
         ],
         object: obj,
       }],
     },
   };
 
-local patch(name, sa, targetobjref, patchtemplate, patchtype="application/strategic-merge-patch+json") =
+local patch(name, sa, targetobjref, patchtemplate, patchtype='application/strategic-merge-patch+json') =
   resourcelocker(name, sa) {
     spec+: {
-      patches:[{
+      patches: [{
         targetObjectRef: targetobjref,
         patchTemplate: std.manifestYamlDoc(patchtemplate),
         patchType: patchtype,
-      }]
-    }
+      }],
+    },
   };
 
 local clusterRoleName(name) =
@@ -56,11 +56,11 @@ local clusterRoleName(name) =
   local start = nameLength - std.min(maxLength, std.length(name));
   prefix + std.substr(name, start, nameLength) + suffix;
 
-local rbac_objs(objdata, verbs=["create", "get", "update", "patch"]) =
+local rbac_objs(objdata, verbs=['create', 'get', 'update', 'patch']) =
   local dest_ns = objdata.namespace;
   local name = objdata.name;
   // Create sa if not provided
-  local saname = name+"-manager";
+  local saname = name + '-manager';
   local serviceaccount = kube.ServiceAccount(saname) {
     metadata+: {
       namespace: namespace,
@@ -68,13 +68,13 @@ local rbac_objs(objdata, verbs=["create", "get", "update", "patch"]) =
   };
   // Create cluster role to get/list/watch resource kind
   local rolename = clusterRoleName(name);
-  local resource = std.asciiLower(objdata.kind)+"s";
+  local resource = std.asciiLower(objdata.kind) + 's';
   local clusterrole_extra_verbs = if dest_ns == null then verbs else [];
   local clusterrole = kube.ClusterRole(rolename) {
     rules+: [{
       apiGroups: [objdata.apigroup],
       resources: [resource],
-      verbs: std.setUnion(["list", "watch"], clusterrole_extra_verbs),
+      verbs: std.setUnion(['list', 'watch'], clusterrole_extra_verbs),
     }],
   };
   local clusterrolebinding = kube.ClusterRoleBinding(rolename) {
@@ -106,7 +106,7 @@ local rbac_objs(objdata, verbs=["create", "get", "update", "patch"]) =
       clusterrole,
       clusterrolebinding,
       role,
-      rolebinding
+      rolebinding,
     ]),
   };
 
@@ -114,7 +114,7 @@ local obj_data(obj) =
   local apigrp = std.split(obj.apiVersion, '/')[0];
   {
     apiVersion: obj.apiVersion,
-    apigroup:: if apigrp == "v1" then "" else apigrp,
+    apigroup:: if apigrp == 'v1' then '' else apigrp,
     kind: obj.kind,
     name: obj.metadata.name,
     namespace: if std.objectHas(obj.metadata, 'namespace') then obj.metadata.namespace,
@@ -122,7 +122,7 @@ local obj_data(obj) =
 
 local rl_obj_name(objdata) =
   if objdata.namespace != null then
-    "%(namespace)s-%(name)s" % objdata
+    '%(namespace)s-%(name)s' % objdata
   else
     objdata.name;
 
@@ -156,12 +156,15 @@ local Resource(obj) =
  * \return A list containing a ServiceAccount, RBAC rules and the
  *         ResourceLocker object
  */
-local Patch(targetobj, patchtemplate, patchstrategy="application/strategic-merge-patch+json") =
+local Patch(targetobj, patchtemplate, patchstrategy='application/strategic-merge-patch+json') =
   local objdata = obj_data(targetobj);
-  local rbac = rbac_objs(objdata, verbs=["get", "patch"]);
+  local rbac = rbac_objs(objdata, verbs=['get', 'patch']);
   local name = rl_obj_name(objdata);
-  rbac.objs + [patch(name, rbac.serviceaccount.metadata.name,
-      std.prune(objdata), patchtemplate, patchstrategy)];
+  rbac.objs + [patch(name,
+                     rbac.serviceaccount.metadata.name,
+                     std.prune(objdata),
+                     patchtemplate,
+                     patchstrategy)];
 
 
 {
