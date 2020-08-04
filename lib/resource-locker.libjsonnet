@@ -14,6 +14,9 @@ local resourcelocker(name, sa) =
   kube._Object('redhatcop.redhat.io/v1alpha1', 'ResourceLocker', name) {
     metadata+: {
       namespace: namespace,
+      annotations+: {
+        'argocd.argoproj.io/sync-options': 'SkipDryRunOnMissingResource=true',
+      },
     },
     spec: {
       serviceAccountRef: {
