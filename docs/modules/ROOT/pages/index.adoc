@@ -44,7 +44,7 @@ local target = kube.DaemonSet('kube-proxy') {
   }
 };
 
-local registry = '602401143452.dkr.ecr.%s.amazonaws.com" % inv.parameters.cloud.region;
+local registry = '602401143452.dkr.ecr.%s.amazonaws.com" % inv.parameters.facts.region;
 local image = "%s/eks/kube-proxy:%s" %
   [registry, inv.parameters.eks.addons.kube_proxy[inv.parameters.eks.version]];
 
