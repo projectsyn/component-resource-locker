@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Upgrade to v1.0.4 ([#7]).
+  This version introduces a new required field `id` in the `patches` array.
+  Since the label selector of the operator deployment changes, this needs manual intervention.
+
 ## [v1.0.0]
 ### Added
 - Argo CD sync option to skip missing CRDs ([#3])
@@ -27,4 +33,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#2]: https://github.com/projectsyn/component-resource-locker/pull/2
 [#3]: https://github.com/projectsyn/component-resource-locker/pull/3
 [#6]: https://github.com/projectsyn/component-resource-locker/pull/6
+[#7]: https://github.com/projectsyn/component-resource-locker/pull/7
 [#8]: https://github.com/projectsyn/component-resource-locker/pull/8

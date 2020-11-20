@@ -56,6 +56,7 @@ local patch(name, sa, targetobjref, patchtemplate, patchtype='application/strate
   resourcelocker(name, sa) {
     spec+: {
       patches: [ {
+        id: 'patch1',
         targetObjectRef: targetobjref,
         patchTemplate: std.manifestYamlDoc(patchtemplate),
         patchType: patchtype,
