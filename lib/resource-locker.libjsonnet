@@ -10,8 +10,14 @@ local inv = kap.inventory();
 local resource_locker_params = inv.parameters.resource_locker;
 local namespace = resource_locker_params.namespace;
 
+/**
+ * \brief The apiVersion to use when creating `ResourceLocker` objects without
+ *        using the helper functions in this library.
+ */
+local apiVersion = 'redhatcop.redhat.io/v1alpha1';
+
 local resourcelocker(name, sa) =
-  kube._Object('redhatcop.redhat.io/v1alpha1', 'ResourceLocker', name) {
+  kube._Object(apiVersion, 'ResourceLocker', name) {
     metadata+: {
       namespace: namespace,
       annotations+: {
@@ -171,6 +177,7 @@ local Patch(targetobj, patchtemplate, patchstrategy='application/strategic-merge
 
 
 {
+  apiVersion: apiVersion,
   Resource: Resource,
   Patch: Patch,
 }
