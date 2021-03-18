@@ -29,25 +29,25 @@ local resourcelocker(name, sa) =
 local resource(name, sa, obj) =
   resourcelocker(name, sa) {
     spec+: {
-      resources: [{
+      resources: [ {
         excludedPaths: [
           '.metadata',
           '.status',
           '.spec.replicas',
         ],
         object: obj,
-      }],
+      } ],
     },
   };
 
 local patch(name, sa, targetobjref, patchtemplate, patchtype='application/strategic-merge-patch+json') =
   resourcelocker(name, sa) {
     spec+: {
-      patches: [{
+      patches: [ {
         targetObjectRef: targetobjref,
         patchTemplate: std.manifestYamlDoc(patchtemplate),
         patchType: patchtype,
-      }],
+      } ],
     },
   };
 
@@ -59,7 +59,7 @@ local clusterRoleName(name) =
   local start = nameLength - std.min(maxLength, std.length(name));
   prefix + std.substr(name, start, nameLength) + suffix;
 
-local rbac_objs(objdata, verbs=['create', 'get', 'update', 'patch']) =
+local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
   local dest_ns = objdata.namespace;
   local name = objdata.name;
   // Create sa if not provided
@@ -74,14 +74,14 @@ local rbac_objs(objdata, verbs=['create', 'get', 'update', 'patch']) =
   local resource = std.asciiLower(objdata.kind) + 's';
   local clusterrole_extra_verbs = if dest_ns == null then verbs else [];
   local clusterrole = kube.ClusterRole(rolename) {
-    rules+: [{
-      apiGroups: [objdata.apigroup],
-      resources: [resource],
-      verbs: std.setUnion(['list', 'watch'], clusterrole_extra_verbs),
-    }],
+    rules+: [ {
+      apiGroups: [ objdata.apigroup ],
+      resources: [ resource ],
+      verbs: std.setUnion([ 'list', 'watch' ], clusterrole_extra_verbs),
+    } ],
   };
   local clusterrolebinding = kube.ClusterRoleBinding(rolename) {
-    subjects_: [serviceaccount],
+    subjects_: [ serviceaccount ],
     roleRef_: clusterrole,
   };
   // Create role in destination namespace to allow managing the resource kind
@@ -89,17 +89,17 @@ local rbac_objs(objdata, verbs=['create', 'get', 'update', 'patch']) =
     metadata+: {
       namespace: dest_ns,
     },
-    rules+: [{
-      apiGroups: [objdata.apigroup],
-      resources: [resource],
+    rules+: [ {
+      apiGroups: [ objdata.apigroup ],
+      resources: [ resource ],
       verbs: verbs,
-    }],
+    } ],
   };
   local rolebinding = if dest_ns != null then kube.RoleBinding(rolename) {
     metadata+: {
       namespace: dest_ns,
     },
-    subjects_: [serviceaccount],
+    subjects_: [ serviceaccount ],
     roleRef_: role,
   };
   {
@@ -141,7 +141,7 @@ local Resource(obj) =
   local objdata = obj_data(obj);
   local rbac = rbac_objs(objdata);
   local name = rl_obj_name(objdata);
-  rbac.objs + [resource(name, rbac.serviceaccount.metadata.name, obj)];
+  rbac.objs + [ resource(name, rbac.serviceaccount.metadata.name, obj) ];
 
 /**
  * \brief Create a resource patch which the operator will continuously apply
@@ -161,13 +161,13 @@ local Resource(obj) =
  */
 local Patch(targetobj, patchtemplate, patchstrategy='application/strategic-merge-patch+json') =
   local objdata = obj_data(targetobj);
-  local rbac = rbac_objs(objdata, verbs=['get', 'patch']);
+  local rbac = rbac_objs(objdata, verbs=[ 'get', 'patch' ]);
   local name = rl_obj_name(objdata);
-  rbac.objs + [patch(name,
-                     rbac.serviceaccount.metadata.name,
-                     std.prune(objdata),
-                     patchtemplate,
-                     patchstrategy)];
+  rbac.objs + [ patch(name,
+                      rbac.serviceaccount.metadata.name,
+                      std.prune(objdata),
+                      patchtemplate,
+                      patchstrategy) ];
 
 
 {
