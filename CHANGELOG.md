@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Argo CD sync option to skip missing CRDs ([#3])
+- Provide `apiVersion` for `ResourceLocker` objects in component API ([#8])
 
 ### Changed
 
@@ -23,3 +24,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#2]: https://github.com/projectsyn/component-resource-locker/pull/2
 [#3]: https://github.com/projectsyn/component-resource-locker/pull/3
 [#6]: https://github.com/projectsyn/component-resource-locker/pull/6
+[#8]: https://github.com/projectsyn/component-resource-locker/pull/8
