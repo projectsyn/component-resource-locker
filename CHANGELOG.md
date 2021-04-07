@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.0]
 ### Breaking Changes
 
 - Upgrade to v1.0.4 ([#7]).
@@ -26,8 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Disable Kapitan plugin ([#2])
 
-[Unreleased]: https://github.com/projectsyn/component-resource-locker/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/projectsyn/component-resource-locker/compare/v2.0.0...HEAD
 [v1.0.0]: https://github.com/projectsyn/component-resource-locker/releases/tag/v1.0.0
+[v2.0.0]: https://github.com/projectsyn/component-resource-locker/releases/tag/v2.0.0
 
 [#1]: https://github.com/projectsyn/component-resource-locker/pull/1
 [#2]: https://github.com/projectsyn/component-resource-locker/pull/2
