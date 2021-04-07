@@ -5,18 +5,28 @@ parameters:
         source: https://redhat-cop.github.io/resource-locker-operator
         chart_name: resource-locker-operator
         version: ${resource_locker:charts:resource-locker-operator}
-        output_path: dependencies/resource-locker/helmcharts/resource-locker-operator
+        output_path: dependencies/resource-locker/helmcharts/resource-locker-operator-${resource_locker:charts:resource-locker-operator}
     compile:
       - input_paths:
           - resource-locker/component/app.jsonnet
         input_type: jsonnet
         output_path: apps/
+      - input_paths:
+          - resource-locker/component/main.jsonnet
+        input_type: jsonnet
+        output_path: resource-locker/
       - output_path: resource-locker/01_resource_locker_operator_helmchart
         input_type: helm
         output_type: yaml
         input_paths:
-          - resource-locker/helmcharts/resource-locker-operator
-        helm_values: {}
+          - resource-locker/helmcharts/resource-locker-operator-${resource_locker:charts:resource-locker-operator}
+        helm_values: ${resource_locker:helmValues}
         helm_params:
           release_name: resource-locker-operator
-          namespace: '${resource_locker:namespace}'
+          namespace: ${resource_locker:namespace}
+      # Until Kapitan supports Helm 3 charts, CRDs need to be copied explicitly
+      # https://github.com/kapicorp/kapitan/issues/647
+      - input_type: copy
+        input_paths:
+          - resource-locker/helmcharts/resource-locker-operator-${resource_locker:charts:resource-locker-operator}/crds/
+        output_path: resource-locker/00_crds/

@@ -2,4 +2,15 @@ parameters:
   resource_locker:
     namespace: syn-resource-locker
     charts:
-      resource-locker-operator: v0.1.2
+      resource-locker-operator: v1.0.4
+    images:
+      resource-locker-operator:
+        registry: quay.io
+        repository: redhat-cop/resource-locker-operator
+        tag: v1.0.4
+        pullPolicy: IfNotPresent
+    helmValues:
+      image:
+        repository: ${resource_locker:images:resource-locker-operator:registry}/${resource_locker:images:resource-locker-operator:repository}
+        tag: ${resource_locker:images:resource-locker-operator:tag}
+        pullPolicy: ${resource_locker:images:resource-locker-operator:pullPolicy}
