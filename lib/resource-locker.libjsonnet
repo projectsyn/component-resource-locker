@@ -107,7 +107,9 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
   };
   // Create cluster role to get/list/watch resource kind
   local rolename = clusterRoleName(name);
-  local resource = std.asciiLower(objdata.kind) + 's';
+  local res = std.asciiLower(objdata.kind);
+  local suffix = if std.endsWith(res, 's') then 'es' else 's';
+  local resource = res + suffix;
   local clusterrole_extra_verbs = if dest_ns == null then verbs else [];
   local clusterrole = kube.ClusterRole(rolename) {
     rules+: [ {
