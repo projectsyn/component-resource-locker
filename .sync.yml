@@ -1,0 +1,7 @@
+:global:
+  componentName: resource-locker
+  feature_goldenTests: true
+
+docs/antora.yml:
+  name: resource-locker
+  title: Resource Locker Operator
