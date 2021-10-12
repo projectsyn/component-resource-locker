@@ -9,6 +9,10 @@ parameters:
         repository: redhat-cop/resource-locker-operator
         tag: v1.0.4
         pullPolicy: IfNotPresent
+      kubectl:
+        registry: quay.io
+        repository: bitnami/kubectl
+        tag: 1.21.5
     helmValues:
       image:
         repository: ${resource_locker:images:resource-locker-operator:registry}/${resource_locker:images:resource-locker-operator:repository}
