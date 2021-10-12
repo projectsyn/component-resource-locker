@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: resource-locker-operator
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: resource-locker-operator
+    app.kubernetes.io/version: v1.0.4
+    helm.sh/chart: resource-locker-operator-v1.0.4
+  name: resource-locker-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: resource-locker-operator
+      app.kubernetes.io/name: resource-locker-operator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: resource-locker-operator
+        app.kubernetes.io/name: resource-locker-operator
+    spec:
+      containers:
+        - args:
+            - --leader-elect
+          command:
+            - /manager
+          image: quay.io/redhat-cop/resource-locker-operator:v1.0.4
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          name: resource-locker-operator
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 20Mi
