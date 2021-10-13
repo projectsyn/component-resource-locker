@@ -5,8 +5,8 @@ metadata:
     app.kubernetes.io/instance: resource-locker-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: resource-locker-operator
-    app.kubernetes.io/version: v1.0.4
-    helm.sh/chart: resource-locker-operator-v1.0.4
+    app.kubernetes.io/version: v1.1.0
+    helm.sh/chart: resource-locker-operator-v1.1.0
   name: resource-locker-operator
 spec:
   replicas: 1
@@ -19,13 +19,34 @@ spec:
       labels:
         app.kubernetes.io/instance: resource-locker-operator
         app.kubernetes.io/name: resource-locker-operator
+        operator: resource-locker-operator
     spec:
       containers:
+        - args:
+            - --secure-listen-address=0.0.0.0:8443
+            - --upstream=http://127.0.0.1:8080/
+            - --logtostderr=true
+            - --tls-cert-file=/etc/certs/tls/tls.crt
+            - --tls-private-key-file=/etc/certs/tls/tls.key
+            - --v=10
+          image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
+          imagePullPolicy: IfNotPresent
+          name: kube-rbac-proxy
+          ports:
+            - containerPort: 8443
+              name: https
+          resources:
+            requests:
+              cpu: 100m
+              memory: 20Mi
+          volumeMounts:
+            - mountPath: /etc/certs/tls
+              name: tls-cert
         - args:
             - --leader-elect
           command:
             - /manager
-          image: quay.io/redhat-cop/resource-locker-operator:v1.0.4
+          image: quay.io/redhat-cop/resource-locker-operator:v1.1.0
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -44,3 +65,9 @@ spec:
             requests:
               cpu: 100m
               memory: 20Mi
+      serviceAccountName: resource-locker-operator-controller-manager
+      volumes:
+        - name: tls-cert
+          secret:
+            defaultMode: 420
+            secretName: resource-locker-operator-certs

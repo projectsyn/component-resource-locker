@@ -85,7 +85,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: NEW_VERSION
-              value: v1.0.4
+              value: v1.1.0
           image: quay.io/bitnami/kubectl:1.21.5
           imagePullPolicy: IfNotPresent
           name: delete-deployment
