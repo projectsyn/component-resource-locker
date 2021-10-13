@@ -16,7 +16,7 @@ local namespace = resource_locker_params.namespace;
 
 local resource_locker_version =
   if std.objectHas(resource_locker_params, 'charts') then
-    resource_locker_params.images['resource-locker-operator'];
+    resource_locker_params.charts['resource-locker-operator'];
 
 // Inject `id` for patches for resource-locker v1.x
 // Defaults to v1.x logic when image version cannot be determined from
