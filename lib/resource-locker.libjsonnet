@@ -14,6 +14,24 @@ local inv = kap.inventory();
 local resource_locker_params = inv.parameters.resource_locker;
 local namespace = resource_locker_params.namespace;
 
+local resource_locker_version =
+  if std.objectHas(resource_locker_params, 'charts') then
+    resource_locker_params.images['resource-locker-operator'];
+
+// Inject `id` for patches for resource-locker v1.x
+// Defaults to v1.x logic when image version cannot be determined from
+// parameters.
+local render_patch(patch) =
+  if (
+    resource_locker_version != null &&
+    std.startsWith(resource_locker_version, 'v0')
+  ) then
+    patch
+  else
+    patch {
+      id: 'patch1',
+    };
+
 /**
  * \brief The apiVersion to use when creating `ResourceLocker` objects without
  *        using the helper functions in this library.
@@ -55,12 +73,13 @@ local resource(name, sa, obj) =
 local patch(name, sa, targetobjref, patchtemplate, patchtype='application/strategic-merge-patch+json') =
   resourcelocker(name, sa) {
     spec+: {
-      patches: [ {
-        id: 'patch1',
-        targetObjectRef: targetobjref,
-        patchTemplate: std.manifestYamlDoc(patchtemplate),
-        patchType: patchtype,
-      } ],
+      patches: [ render_patch(
+        {
+          targetObjectRef: targetobjref,
+          patchTemplate: std.manifestYamlDoc(patchtemplate),
+          patchType: patchtype,
+        }
+      ) ],
     },
   };
 
