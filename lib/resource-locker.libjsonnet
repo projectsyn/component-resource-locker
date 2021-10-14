@@ -21,10 +21,10 @@ local resource_locker_version =
 // Inject `id` for patches for resource-locker v1.x
 // Defaults to v1.x logic when image version cannot be determined from
 // parameters.
-local render_patch(patch) =
+local render_patch(patch, rl_version) =
   if (
-    resource_locker_version != null &&
-    std.startsWith(resource_locker_version, 'v0')
+    rl_version != null &&
+    std.startsWith(rl_version, 'v0')
   ) then
     patch
   else
@@ -78,7 +78,8 @@ local patch(name, sa, targetobjref, patchtemplate, patchtype='application/strate
           targetObjectRef: targetobjref,
           patchTemplate: std.manifestYamlDoc(patchtemplate),
           patchType: patchtype,
-        }
+        },
+        resource_locker_version
       ) ],
     },
   };
@@ -214,4 +215,5 @@ local Patch(targetobj, patchtemplate, patchstrategy='application/strategic-merge
   apiVersion: apiVersion,
   Resource: Resource,
   Patch: Patch,
+  renderPatch: render_patch,
 }
