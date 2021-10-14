@@ -21,7 +21,7 @@ local resource_locker_version =
 // Inject `id` for patches for resource-locker v1.x
 // Defaults to v1.x logic when image version cannot be determined from
 // parameters.
-local render_patch(patch, rl_version) =
+local render_patch(patch, rl_version, patch_id='patch1') =
   if (
     rl_version != null &&
     std.startsWith(rl_version, 'v0')
@@ -29,7 +29,7 @@ local render_patch(patch, rl_version) =
     patch
   else
     patch {
-      id: 'patch1',
+      id: patch_id,
     };
 
 /**
