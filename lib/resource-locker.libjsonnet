@@ -168,7 +168,20 @@ local rl_obj_name(objdata) =
   if objdata.namespace != null then
     '%s-%s' % [ objdata.namespace, name ]
   else
-    name;
+    // Reduce potential for name collisions when generating names for
+    // cluster-scoped ResourceLocker configurations.
+    local prefix =
+      if objdata.apigroup != '' then
+        '%s-%s' % [
+          std.asciiLower(objdata.kind),
+          std.strReplace(objdata.apigroup, '.', '-'),
+        ]
+      else
+        std.asciiLower(objdata.kind);
+    '%s-%s' % [
+      prefix,
+      name,
+    ];
 
 /**
  * \brief Create a managed resource (similar to Espejo, but for single NS)
