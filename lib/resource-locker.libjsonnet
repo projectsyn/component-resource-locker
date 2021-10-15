@@ -98,23 +98,29 @@ local replaceColon(str) =
 local rl_obj_name(objdata) =
   // Some objects like ClusterRoleBinding can contain colons.
   local name = replaceColon(objdata.name);
-  if objdata.namespace != null then
-    '%s-%s' % [ objdata.namespace, name ]
-  else
-    // Reduce potential for name collisions when generating names for
-    // cluster-scoped ResourceLocker configurations.
-    local prefix =
-      if objdata.apigroup != '' then
-        '%s-%s' % [
-          std.asciiLower(objdata.kind),
-          std.strReplace(objdata.apigroup, '.', '-'),
-        ]
+  local n =
+    if objdata.namespace != null then
+      '%s-%s' % [ objdata.namespace, name ]
+    else
+      // Reduce potential for name collisions when generating names for
+      // cluster-scoped ResourceLocker configurations.
+      local prefix =
+        if objdata.apigroup != '' &&
+           std.length(objdata.apigroup + objdata.kind + name) <= 61
+        then
+          '%s-%s' % [
+            std.asciiLower(objdata.kind),
+            std.strReplace(objdata.apigroup, '.', '-'),
+          ]
+        else
+          std.asciiLower(objdata.kind);
+      if std.length(prefix + name) >= 63 then
+        name
       else
-        std.asciiLower(objdata.kind);
-    '%s-%s' % [
-      prefix,
-      name,
-    ];
+        '%s-%s' % [ prefix, name ];
+
+  assert std.length(n) <= 63;
+  n;
 
 local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
   local dest_ns = objdata.namespace;
