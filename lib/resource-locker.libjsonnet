@@ -118,8 +118,8 @@ local rl_obj_name(objdata) =
 
 local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
   local dest_ns = objdata.namespace;
-  // Some objects like ClusterRoleBinding can contain colons.
-  local name = replaceColon(objdata.name);
+  // Use full rl_obj_name to avoid collisions for cluster-scoped configs
+  local name = rl_obj_name(objdata);
   // Create sa if not provided
   local saname = name + '-manager';
   local serviceaccount = kube.ServiceAccount(saname) {
