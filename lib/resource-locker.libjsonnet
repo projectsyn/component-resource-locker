@@ -95,10 +95,37 @@ local clusterRoleName(name) =
 local replaceColon(str) =
   std.strReplace(str, ':', '-');
 
-local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
-  local dest_ns = objdata.namespace;
+local rl_obj_name(objdata) =
   // Some objects like ClusterRoleBinding can contain colons.
   local name = replaceColon(objdata.name);
+  local n =
+    if objdata.namespace != null then
+      '%s-%s' % [ objdata.namespace, name ]
+    else
+      // Reduce potential for name collisions when generating names for
+      // cluster-scoped ResourceLocker configurations.
+      local prefix =
+        if objdata.apigroup != '' &&
+           std.length(objdata.apigroup + objdata.kind + name) <= 61
+        then
+          '%s-%s' % [
+            std.asciiLower(objdata.kind),
+            std.strReplace(objdata.apigroup, '.', '-'),
+          ]
+        else
+          std.asciiLower(objdata.kind);
+      if std.length(prefix + name) >= 63 then
+        name
+      else
+        '%s-%s' % [ prefix, name ];
+
+  assert std.length(n) <= 63;
+  n;
+
+local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
+  local dest_ns = objdata.namespace;
+  // Use full rl_obj_name to avoid collisions for cluster-scoped configs
+  local name = rl_obj_name(objdata);
   // Create sa if not provided
   local saname = name + '-manager';
   local serviceaccount = kube.ServiceAccount(saname) {
@@ -161,14 +188,6 @@ local obj_data(obj) =
     name: obj.metadata.name,
     namespace: if std.objectHas(obj.metadata, 'namespace') then obj.metadata.namespace,
   };
-
-local rl_obj_name(objdata) =
-  // Some objects like ClusterRoleBinding can contain colons.
-  local name = replaceColon(objdata.name);
-  if objdata.namespace != null then
-    '%s-%s' % [ objdata.namespace, name ]
-  else
-    name;
 
 /**
  * \brief Create a managed resource (similar to Espejo, but for single NS)
