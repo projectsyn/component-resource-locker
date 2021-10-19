@@ -114,7 +114,7 @@ local rl_obj_name(objdata) =
           ]
         else
           std.asciiLower(objdata.kind);
-      if std.length(prefix + name) >= 63 then
+      if std.length(prefix + name) > 63 then
         name
       else
         '%s-%s' % [ prefix, name ];
@@ -127,7 +127,10 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
   // Use full rl_obj_name to avoid collisions for cluster-scoped configs
   local name = rl_obj_name(objdata);
   // Create sa if not provided
-  local saname = name + '-manager';
+  // Append '-manager' to sa name if we have room
+  local saname =
+    local n = name + '-manager';
+    if std.length(n) > 63 then name else n;
   local serviceaccount = kube.ServiceAccount(saname) {
     metadata+: {
       namespace: namespace,
