@@ -1,2 +1,4 @@
 parameters:
+  facts:
+    distribution: openshift4
   resource_locker: {}

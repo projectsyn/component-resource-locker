@@ -5,3 +5,11 @@
 docs/antora.yml:
   name: resource-locker
   title: Resource Locker Operator
+
+.github/workflows/test.yaml:
+  goldenTest_makeTarget: golden-diff -e instance=${{ matrix.instance }}
+  matrix:
+    key: instance
+    entries:
+      - defaults
+      - openshift4
