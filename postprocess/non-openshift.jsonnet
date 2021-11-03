@@ -67,16 +67,12 @@ local fixup_servicemonitor(obj) =
   };
 
 local fixup_obj(obj) =
-  if distribution != 'openshift4' then (
-    if obj.kind == 'Deployment' then
-      fixup_deploy(obj)
-    else if obj.kind == 'Service' then
-      fixup_service(obj)
-    else if obj.kind == 'ServiceMonitor' then
-      fixup_servicemonitor(obj)
-    else
-      obj
-  )
+  if obj.kind == 'Deployment' then
+    fixup_deploy(obj)
+  else if obj.kind == 'Service' then
+    fixup_service(obj)
+  else if obj.kind == 'ServiceMonitor' then
+    fixup_servicemonitor(obj)
   else
     obj;
 
@@ -85,7 +81,10 @@ local fixup(obj_file) =
   // process all objs
   [ fixup_obj(obj) for obj in objs ];
 
-{
-  [stem(elem)]: fixup(input_file(elem))
-  for elem in chart_files
-}
+if distribution != 'openshift4' then
+  {
+    [stem(elem)]: fixup(input_file(elem))
+    for elem in chart_files
+  }
+else
+  {}
