@@ -30,3 +30,9 @@ parameters:
         input_paths:
           - resource-locker/helmcharts/resource-locker-operator-${resource_locker:charts:resource-locker-operator}/crds/
         output_path: resource-locker/00_crds/
+  commodore:
+    postprocess:
+      filters:
+        - type: jsonnet
+          filter: postprocess/non-openshift.jsonnet
+          path: resource-locker/01_resource_locker_operator_helmchart/resource-locker-operator/templates
