@@ -164,9 +164,9 @@ metadata:
   namespace: syn-resource-locker
 spec:
   ports:
-  - name: http
-    port: 8080
-    targetPort: http
+  - name: https
+    port: 8443
+    targetPort: https
   selector:
     operator: resource-locker-operator
 ---
@@ -179,9 +179,13 @@ metadata:
   namespace: syn-resource-locker
 spec:
   endpoints:
-  - interval: 30s
-    port: http
-    scheme: http
+  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    interval: 30s
+    port: https
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prometheus/configmaps/serving-certs-ca-bundle/service-ca.crt
+      serverName: resource-locker-operator-controller-manager-metrics.syn-resource-locker.svc
   selector:
     matchLabels:
       operator: resource-locker-operator

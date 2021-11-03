@@ -23,26 +23,6 @@ spec:
     spec:
       containers:
       - args:
-        - --secure-listen-address=0.0.0.0:8443
-        - --upstream=http://127.0.0.1:8080/
-        - --logtostderr=true
-        - --tls-cert-file=/etc/certs/tls/tls.crt
-        - --tls-private-key-file=/etc/certs/tls/tls.key
-        - --v=10
-        image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
-        imagePullPolicy: IfNotPresent
-        name: kube-rbac-proxy
-        ports:
-        - containerPort: 8443
-          name: https
-        resources:
-          requests:
-            cpu: 100m
-            memory: 20Mi
-        volumeMounts:
-        - mountPath: /etc/certs/tls
-          name: tls-cert
-      - args:
         - --leader-elect
         command:
         - /manager
@@ -55,6 +35,9 @@ spec:
           initialDelaySeconds: 15
           periodSeconds: 20
         name: resource-locker-operator
+        ports:
+        - containerPort: 8080
+          name: http
         readinessProbe:
           httpGet:
             path: /readyz
@@ -66,8 +49,4 @@ spec:
             cpu: 100m
             memory: 20Mi
       serviceAccountName: resource-locker-operator-controller-manager
-      volumes:
-      - name: tls-cert
-        secret:
-          defaultMode: 420
-          secretName: resource-locker-operator-certs
+      volumes: []
