@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '-10'
+  labels:
+    name: delete-operator-deployment
+  name: delete-operator-deployment
+  namespace: syn-resource-locker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '-10'
+  labels:
+    name: delete-operator-deployment
+  name: delete-operator-deployment
+  namespace: syn-resource-locker
+rules:
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - get
+      - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '-10'
+  labels:
+    name: delete-operator-deployment
+  name: delete-operator-deployment
+  namespace: syn-resource-locker
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: delete-operator-deployment
+subjects:
+  - kind: ServiceAccount
+    name: delete-operator-deployment
+    namespace: syn-resource-locker
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: '-10'
+  labels:
+    name: delete-operator-deployment
+  name: delete-operator-deployment
+  namespace: syn-resource-locker
+spec:
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        name: delete-operator-deployment
+    spec:
+      containers:
+        - args: []
+          command:
+            - bash
+            - -c
+            - "#!/bin/bash\n\nset -eo pipefail\n\nif ! kubectl -n \"${NAMESPACE}\"\
+              \ get deployment resource-locker-operator; then\n  echo \"No resource\
+              \ locker operator deployment found, exiting...\"\n  exit 0\nfi\n\nchart_version=$(kubectl\
+              \ -n \"${NAMESPACE}\" get deployment resource-locker-operator \\\n \
+              \ -ojsonpath='{.metadata.labels.helm\\.sh/chart}')\n\nif [ \"${chart_version}\"\
+              \ != \"resource-locker-operator-${NEW_VERSION}\" ]; then\n  echo \"\
+              Deleting resource locker operator deployment...\"\n  kubectl -n \"${NAMESPACE}\"\
+              \ delete --wait=true --cascade=foreground deployment resource-locker-operator\n\
+              else\n  echo \"No chart version change, exiting...\"\nfi\nexit 0\n"
+          env:
+            - name: HOME
+              value: /work
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NEW_VERSION
+              value: v1.1.0
+          image: quay.io/bitnami/kubectl:1.21.5
+          imagePullPolicy: IfNotPresent
+          name: delete-deployment
+          ports: []
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /work
+              name: work
+      imagePullSecrets: []
+      initContainers: []
+      restartPolicy: OnFailure
+      serviceAccountName: delete-operator-deployment
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - emptyDir: {}
+          name: work
