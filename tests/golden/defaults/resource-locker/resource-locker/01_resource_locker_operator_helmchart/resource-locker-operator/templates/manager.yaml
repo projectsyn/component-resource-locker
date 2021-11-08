@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/instance: resource-locker-operator
-    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: resource-locker-operator
     app.kubernetes.io/version: v1.1.0
     helm.sh/chart: resource-locker-operator-v1.1.0
