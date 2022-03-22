@@ -1,6 +1,11 @@
 :global:
   componentName: resource-locker
   feature_goldenTests: true
+  testMatrix:
+    key: instance
+    entries:
+      - defaults
+      - openshift4
 
 docs/antora.yml:
   name: resource-locker
@@ -8,8 +13,3 @@ docs/antora.yml:
 
 .github/workflows/test.yaml:
   goldenTest_makeTarget: golden-diff -e instance=${{ matrix.instance }}
-  matrix:
-    key: instance
-    entries:
-      - defaults
-      - openshift4
