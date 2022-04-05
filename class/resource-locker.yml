@@ -22,7 +22,7 @@ parameters:
           - resource-locker/helmcharts/resource-locker-operator-${resource_locker:charts:resource-locker-operator}
         helm_values: ${resource_locker:helmValues}
         helm_params:
-          release_name: resource-locker-operator
+          name: resource-locker-operator
           namespace: ${resource_locker:namespace}
   commodore:
     postprocess:
