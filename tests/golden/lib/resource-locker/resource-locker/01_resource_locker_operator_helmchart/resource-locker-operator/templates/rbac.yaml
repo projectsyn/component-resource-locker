@@ -97,7 +97,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: resource-locker-operator-leader-election-role
-  namespace: syn-resource-locker
 rules:
 - apiGroups:
   - ''
@@ -143,7 +142,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: resource-locker-operator-leader-election-rolebinding
-  namespace: syn-resource-locker
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
