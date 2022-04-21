@@ -10,7 +10,7 @@ parameters:
         tag: v1.1.0
         pullPolicy: IfNotPresent
       kubectl:
-        registry: quay.io
+        registry: docker.io
         repository: bitnami/kubectl
         tag: 1.21.5
     helmValues:
