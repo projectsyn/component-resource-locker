@@ -1,7 +1,0 @@
-filters:
-  - path: resource-locker/01_resource_locker_operator_helmchart/resource-locker-operator/templates
-    type: builtin
-    filter: helm_namespace
-    filterargs:
-      namespace: ${resource_locker:namespace}
-      create_namespace: 'true'
