@@ -11,3 +11,7 @@ parameters:
         input_paths:
           - tests/test-lock.jsonnet
         output_path: tests/
+      - input_type: jsonnet
+        input_paths:
+          - tests/test-patch-long-name.jsonnet
+        output_path: tests/
