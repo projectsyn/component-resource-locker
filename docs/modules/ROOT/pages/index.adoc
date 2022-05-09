@@ -4,6 +4,14 @@ The {doctitle} allows you to specify a set of configurations that the operator w
 
 The component provides the Jsonnet library `resource-locker.libjsonnet`, which other components can use to provide configurations for the operator.
 
+[TIP]
+====
+The component library generates unique names for the Kubernetes resources required to apply a patch.
+The resource names are generated to be unique, even if multiple components try to patch the same target object.
+
+Additionally, the component library adds labels and annotations containing human-readable information about the resource to patch and the component managing the patch.
+====
+
 A brief usage example which creates a configuration for the operator which enforces the presence of a resource quota object in namespace `default`:
 
 [source,jsonnet]
