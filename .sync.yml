@@ -5,6 +5,7 @@
     key: instance
     entries:
       - defaults
+      - lib
       - openshift4
 
 docs/antora.yml:

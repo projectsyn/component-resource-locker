@@ -33,6 +33,7 @@ jobs:
       matrix:
         instance:
           - defaults
+          - lib
           - openshift4
     defaults:
       run:
@@ -49,6 +50,7 @@ jobs:
       matrix:
         instance:
           - defaults
+          - lib
           - openshift4
     defaults:
       run:

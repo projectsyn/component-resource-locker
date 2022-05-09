@@ -1,0 +1,13 @@
+parameters:
+  resource_locker: {}
+
+  kapitan:
+    compile:
+      - input_type: jsonnet
+        input_paths:
+          - tests/test-patch.jsonnet
+        output_path: tests/
+      - input_type: jsonnet
+        input_paths:
+          - tests/test-lock.jsonnet
+        output_path: tests/
