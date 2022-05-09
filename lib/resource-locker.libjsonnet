@@ -140,8 +140,26 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
   local saname =
     local n = name + '-manager';
     if std.length(n) > 63 then name else n;
+  // Add human-readable information about the resource locker target to RBAC
+  // objects as labels and annotations.
+  local rbac_meta = {
+    annotations+: {
+      'resourcelocker.syn.tools/target-object':
+        if objdata.apigroup != '' then
+          '%(apigroup)s.%(kind)s/%(name)s' % objdata
+        else
+          '%(kind)s/%(name)s' % objdata,
+      // We don't have to check if namespace is != null here, as we prune all
+      // objects anyway.
+      'resourcelocker.syn.tools/target-namespace': objdata.namespace,
+    },
+    labels+: {
+      'app.kubernetes.io/managed-by': 'commodore',
+      'app.kubernetes.io/part-of': instance,
+    },
+  };
   local serviceaccount = kube.ServiceAccount(saname) {
-    metadata+: {
+    metadata+: rbac_meta {
       namespace: namespace,
     },
   };
@@ -152,6 +170,7 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
   local resource = res + suffix;
   local clusterrole_extra_verbs = if dest_ns == null then verbs else [];
   local clusterrole = kube.ClusterRole(rolename) {
+    metadata+: rbac_meta,
     rules+: [ {
       apiGroups: [ objdata.apigroup ],
       resources: [ resource ],
@@ -159,12 +178,13 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
     } ],
   };
   local clusterrolebinding = kube.ClusterRoleBinding(rolename) {
+    metadata+: rbac_meta,
     subjects_: [ serviceaccount ],
     roleRef_: clusterrole,
   };
   // Create role in destination namespace to allow managing the resource kind
   local role = if dest_ns != null then kube.Role(rolename) {
-    metadata+: {
+    metadata+: rbac_meta {
       namespace: dest_ns,
     },
     rules+: [ {
@@ -174,7 +194,7 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
     } ],
   };
   local rolebinding = if dest_ns != null then kube.RoleBinding(rolename) {
-    metadata+: {
+    metadata+: rbac_meta {
       namespace: dest_ns,
     },
     subjects_: [ serviceaccount ],
