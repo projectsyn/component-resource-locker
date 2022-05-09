@@ -1,0 +1,187 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: resource-locker-operator-controller-manager
+  namespace: syn-resource-locker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: resource-locker-operator-manager-role
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  - serviceaccounts
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - redhatcop.redhat.io
+  resources:
+  - resourcelockers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - redhatcop.redhat.io
+  resources:
+  - resourcelockers/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: resource-locker-operator-metrics-reader
+rules:
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: resource-locker-operator-proxy-role
+rules:
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: resource-locker-operator-manager-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: resource-locker-operator-manager-role
+subjects:
+- kind: ServiceAccount
+  name: resource-locker-operator-controller-manager
+  namespace: syn-resource-locker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: resource-locker-operator-proxy-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: resource-locker-operator-proxy-role
+subjects:
+- kind: ServiceAccount
+  name: resource-locker-operator-controller-manager
+  namespace: syn-resource-locker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: resource-locker-operator-leader-election-role
+  namespace: syn-resource-locker
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ''
+  resources:
+  - configmaps/status
+  verbs:
+  - get
+  - update
+  - patch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: resource-locker-operator-leader-election-rolebinding
+  namespace: syn-resource-locker
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: resource-locker-operator-leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: resource-locker-operator-controller-manager
+  namespace: syn-resource-locker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: resource-locker-operator-certs
+  labels:
+    operator: resource-locker-operator
+  name: resource-locker-operator-controller-manager-metrics
+  namespace: syn-resource-locker
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+  selector:
+    operator: resource-locker-operator
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    control-plane: controller-manager
+  name: resource-locker-operator-controller-manager-metrics-monitor
+  namespace: syn-resource-locker
+spec:
+  endpoints:
+  - interval: 30s
+    port: http
+    scheme: http
+  selector:
+    matchLabels:
+      operator: resource-locker-operator
