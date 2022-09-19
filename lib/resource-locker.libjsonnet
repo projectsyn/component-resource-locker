@@ -162,6 +162,17 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
     metadata+: rbac_meta {
       namespace: namespace,
     },
+    secrets: [ { name: saname } ],
+  };
+  // Create service account token secret
+  local tokensecret = kube.Secret(saname) {
+    metadata+: rbac_meta {
+      namespace: namespace,
+      annotations+: {
+        'kubernetes.io/service-account.name': saname,
+      },
+    },
+    type: 'kubernetes.io/service-account-token',
   };
   // Create cluster role to get/list/watch resource kind
   local rolename = clusterRoleName(name);
@@ -204,6 +215,7 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
     serviceaccount: serviceaccount,
     objs: std.prune([
       serviceaccount,
+      tokensecret,
       clusterrole,
       clusterrolebinding,
       role,

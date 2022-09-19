@@ -10,6 +10,23 @@ metadata:
     name: foo-test-6e4cb03e339fd56-manager
   name: foo-test-6e4cb03e339fd56-manager
   namespace: syn-resource-locker
+secrets:
+  - name: foo-test-6e4cb03e339fd56-manager
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubernetes.io/service-account.name: foo-test-6e4cb03e339fd56-manager
+    resourcelocker.syn.tools/target-namespace: foo
+    resourcelocker.syn.tools/target-object: apps.Deployment/test
+  labels:
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/part-of: resource-locker
+    name: foo-test-6e4cb03e339fd56-manager
+  name: foo-test-6e4cb03e339fd56-manager
+  namespace: syn-resource-locker
+type: kubernetes.io/service-account-token
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
