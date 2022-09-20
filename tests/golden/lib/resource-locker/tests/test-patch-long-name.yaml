@@ -9,6 +9,22 @@ metadata:
     name: clusterrolebinding-system-build-775295b1777a143-manager
   name: clusterrolebinding-system-build-775295b1777a143-manager
   namespace: syn-resource-locker
+secrets:
+  - name: clusterrolebinding-system-build-775295b1777a143-manager
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubernetes.io/service-account.name: clusterrolebinding-system-build-775295b1777a143-manager
+    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRoleBinding/system:build-strategy-docker-binding
+  labels:
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/part-of: resource-locker
+    name: clusterrolebinding-system-build-775295b1777a143-manager
+  name: clusterrolebinding-system-build-775295b1777a143-manager
+  namespace: syn-resource-locker
+type: kubernetes.io/service-account-token
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
