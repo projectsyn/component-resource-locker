@@ -3,28 +3,28 @@ kind: ServiceAccount
 metadata:
   annotations:
     resourcelocker.syn.tools/target-namespace: foo
-    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRole/test
+    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRoleBinding/test
   labels:
     app.kubernetes.io/managed-by: commodore
     app.kubernetes.io/part-of: resource-locker
-    name: foo-test-950d7de603ea050-manager
-  name: foo-test-950d7de603ea050-manager
+    name: foo-test-8c80c57012dfcac-manager
+  name: foo-test-8c80c57012dfcac-manager
   namespace: syn-resource-locker
 secrets:
-  - name: foo-test-950d7de603ea050-manager
+  - name: foo-test-8c80c57012dfcac-manager
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   annotations:
-    kubernetes.io/service-account.name: foo-test-950d7de603ea050-manager
+    kubernetes.io/service-account.name: foo-test-8c80c57012dfcac-manager
     resourcelocker.syn.tools/target-namespace: foo
-    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRole/test
+    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRoleBinding/test
   labels:
     app.kubernetes.io/managed-by: commodore
     app.kubernetes.io/part-of: resource-locker
-    name: foo-test-950d7de603ea050-manager
-  name: foo-test-950d7de603ea050-manager
+    name: foo-test-8c80c57012dfcac-manager
+  name: foo-test-8c80c57012dfcac-manager
   namespace: syn-resource-locker
 type: kubernetes.io/service-account-token
 ---
@@ -36,12 +36,12 @@ metadata:
       cluster-admin because it's otherwise impossible to manage clusterrolebindings
       with unknown role references
     resourcelocker.syn.tools/target-namespace: foo
-    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRole/test
+    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRoleBinding/test
   labels:
     app.kubernetes.io/managed-by: commodore
     app.kubernetes.io/part-of: resource-locker
-    name: syn-resource-locker-foo-test-950d7de603ea050-manager
-  name: syn-resource-locker-foo-test-950d7de603ea050-manager
+    name: syn-resource-locker-foo-test-8c80c57012dfcac-manager
+  name: syn-resource-locker-foo-test-8c80c57012dfcac-manager
 rules:
   - apiGroups:
       - '*'
@@ -55,19 +55,19 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     resourcelocker.syn.tools/target-namespace: foo
-    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRole/test
+    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRoleBinding/test
   labels:
     app.kubernetes.io/managed-by: commodore
     app.kubernetes.io/part-of: resource-locker
-    name: syn-resource-locker-foo-test-950d7de603ea050-manager
-  name: syn-resource-locker-foo-test-950d7de603ea050-manager
+    name: syn-resource-locker-foo-test-8c80c57012dfcac-manager
+  name: syn-resource-locker-foo-test-8c80c57012dfcac-manager
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: syn-resource-locker-foo-test-950d7de603ea050-manager
+  name: syn-resource-locker-foo-test-8c80c57012dfcac-manager
 subjects:
   - kind: ServiceAccount
-    name: foo-test-950d7de603ea050-manager
+    name: foo-test-8c80c57012dfcac-manager
     namespace: syn-resource-locker
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -75,18 +75,18 @@ kind: Role
 metadata:
   annotations:
     resourcelocker.syn.tools/target-namespace: foo
-    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRole/test
+    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRoleBinding/test
   labels:
     app.kubernetes.io/managed-by: commodore
     app.kubernetes.io/part-of: resource-locker
-    name: syn-resource-locker-foo-test-950d7de603ea050-manager
-  name: syn-resource-locker-foo-test-950d7de603ea050-manager
+    name: syn-resource-locker-foo-test-8c80c57012dfcac-manager
+  name: syn-resource-locker-foo-test-8c80c57012dfcac-manager
   namespace: foo
 rules:
   - apiGroups:
       - rbac.authorization.k8s.io
     resources:
-      - clusterroles
+      - clusterrolebindings
     verbs:
       - get
       - patch
@@ -96,20 +96,20 @@ kind: RoleBinding
 metadata:
   annotations:
     resourcelocker.syn.tools/target-namespace: foo
-    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRole/test
+    resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRoleBinding/test
   labels:
     app.kubernetes.io/managed-by: commodore
     app.kubernetes.io/part-of: resource-locker
-    name: syn-resource-locker-foo-test-950d7de603ea050-manager
-  name: syn-resource-locker-foo-test-950d7de603ea050-manager
+    name: syn-resource-locker-foo-test-8c80c57012dfcac-manager
+  name: syn-resource-locker-foo-test-8c80c57012dfcac-manager
   namespace: foo
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: syn-resource-locker-foo-test-950d7de603ea050-manager
+  name: syn-resource-locker-foo-test-8c80c57012dfcac-manager
 subjects:
   - kind: ServiceAccount
-    name: foo-test-950d7de603ea050-manager
+    name: foo-test-8c80c57012dfcac-manager
     namespace: syn-resource-locker
 ---
 apiVersion: redhatcop.redhat.io/v1alpha1
@@ -118,8 +118,8 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   labels:
-    name: foo-test-950d7de603ea050
-  name: foo-test-950d7de603ea050
+    name: foo-test-8c80c57012dfcac
+  name: foo-test-8c80c57012dfcac
   namespace: syn-resource-locker
 spec:
   patches:
@@ -128,8 +128,8 @@ spec:
       patchType: application/strategic-merge-patch+json
       targetObjectRef:
         apiVersion: rbac.authorization.k8s.io/v1
-        kind: ClusterRole
+        kind: ClusterRoleBinding
         name: test
         namespace: foo
   serviceAccountRef:
-    name: foo-test-950d7de603ea050-manager
+    name: foo-test-8c80c57012dfcac-manager
