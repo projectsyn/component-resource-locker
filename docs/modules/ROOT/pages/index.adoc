@@ -12,6 +12,14 @@ The resource names are generated to be unique, even if multiple components try t
 Additionally, the component library adds labels and annotations containing human-readable information about the resource to patch and the component managing the patch.
 ====
 
+[NOTE]
+====
+The component library will grant a manager ServiceAccount `cluster-admin` permissions when the target resource is a `ClusterRoleBinding`.
+This is necessary, because Kubernetes doesn't allow principals to modify `ClusterRoleBindings` which are more privileged than the principal and we can't reliably identify any potential permissions that the ServiceAccount must have in order to be able to modify the managed `ClusterRoleBinding`.
+
+For the same reason, the library will grant a manager ServiceAccount `admin` permissions in the target resource's namespace if the resource is a `RoleBinding`.
+====
+
 A brief usage example which creates a configuration for the operator which enforces the presence of a resource quota object in namespace `default`:
 
 [source,jsonnet]
