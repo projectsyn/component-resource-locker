@@ -215,16 +215,35 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
     roleRef_: clusterrole,
   };
   // Create role in destination namespace to allow managing the resource kind
-  local role = if dest_ns != null then kube.Role(rolename) {
-    metadata+: rbac_meta {
-      namespace: dest_ns,
-    },
-    rules+: [ {
-      apiGroups: [ objdata.apigroup ],
-      resources: [ resource ],
-      verbs: verbs,
-    } ],
-  };
+  local role = if dest_ns != null then
+    if objdata.kind != 'RoleBinding' then
+      kube.Role(rolename) {
+        metadata+: rbac_meta {
+          namespace: dest_ns,
+        },
+        rules+: [ {
+          apiGroups: [ objdata.apigroup ],
+          resources: [ resource ],
+          verbs: verbs,
+        } ],
+      }
+    else
+      kube.Role(rolename) {
+        metadata+: rbac_meta {
+          namespace: dest_ns,
+          annotations+: {
+            'resourcelocker.syn.tools/cluster-admin':
+              'This resource-locker role grants admin ' +
+              "because it's otherwise impossible to manage rolebindings " +
+              'with unknown role references',
+          },
+        },
+        rules+: [ {
+          apiGroups: [ '*' ],
+          resources: [ '*' ],
+          verbs: [ '*' ],
+        } ],
+      };
   local rolebinding = if dest_ns != null then kube.RoleBinding(rolename) {
     metadata+: rbac_meta {
       namespace: dest_ns,
