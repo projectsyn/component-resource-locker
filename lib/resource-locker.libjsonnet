@@ -180,14 +180,35 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
   local suffix = if std.endsWith(res, 's') then 'es' else 's';
   local resource = res + suffix;
   local clusterrole_extra_verbs = if dest_ns == null then verbs else [];
-  local clusterrole = kube.ClusterRole(rolename) {
-    metadata+: rbac_meta,
-    rules+: [ {
-      apiGroups: [ objdata.apigroup ],
-      resources: [ resource ],
-      verbs: std.setUnion([ 'list', 'watch' ], clusterrole_extra_verbs),
-    } ],
-  };
+  // if we want to manage a clusterrolebinding, we need to grant cluster
+  // admin, as we can't reliably identify the permissions we may be granting
+  // by editing a clusterrolebinding.
+  local clusterrole =
+    if objdata.kind != 'ClusterRoleBinding' then
+      kube.ClusterRole(rolename) {
+        metadata+: rbac_meta,
+        rules+: [ {
+          apiGroups: [ objdata.apigroup ],
+          resources: [ resource ],
+          verbs: std.setUnion([ 'list', 'watch' ], clusterrole_extra_verbs),
+        } ],
+      }
+    else
+      kube.ClusterRole(rolename) {
+        metadata+: rbac_meta {
+          annotations+: {
+            'resourcelocker.syn.tools/cluster-admin':
+              'This resource-locker clusterrole grants cluster-admin ' +
+              "because it's otherwise impossible to manage clusterrolebindings " +
+              'with unknown role references',
+          },
+        },
+        rules: [ {
+          apiGroups: [ '*' ],
+          resources: [ '*' ],
+          verbs: [ '*' ],
+        } ],
+      };
   local clusterrolebinding = kube.ClusterRoleBinding(rolename) {
     metadata+: rbac_meta,
     subjects_: [ serviceaccount ],
