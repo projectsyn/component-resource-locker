@@ -180,11 +180,8 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
   local suffix = if std.endsWith(res, 's') then 'es' else 's';
   local resource = res + suffix;
   local clusterrole_extra_verbs = if dest_ns == null then verbs else [];
-  // if we want to manage a clusterrolebinding, we need to grant cluster
-  // admin, as we can't reliably identify the permissions we may be granting
-  // by editing a clusterrolebinding.
   local clusterrole =
-    if objdata.kind != 'ClusterRoleBinding' then
+    if !std.member([ 'ClusterRoleBinding', 'ClusterRole' ], objdata.kind) then
       kube.ClusterRole(rolename) {
         metadata+: rbac_meta,
         rules+: [ {
@@ -194,6 +191,11 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
         } ],
       }
     else
+      // If we're managing a ClusterRoleBinding or ClusterRole, grant
+      // cluster-admin permissions (modelled as { apiGroups: ['*'], resources:
+      // ['*'], verbs: ['*'] }).
+      // This is necessary because we can't reliably identify the permissions
+      // we may be granting by editing a clusterrolebinding.
       kube.ClusterRole(rolename) {
         metadata+: rbac_meta {
           annotations+: {
@@ -216,7 +218,7 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
   };
   // Create role in destination namespace to allow managing the resource kind
   local role = if dest_ns != null then
-    if objdata.kind != 'RoleBinding' then
+    if !std.member([ 'RoleBinding', 'Role' ], objdata.kind) then
       kube.Role(rolename) {
         metadata+: rbac_meta {
           namespace: dest_ns,
@@ -228,6 +230,9 @@ local rbac_objs(objdata, verbs=[ 'create', 'get', 'update', 'patch' ]) =
         } ],
       }
     else
+      // If we're managing a RoleBinding or Role, grant admin permissions
+      // (modelled as { apiGroups: ['*'], resources: ['*'], verbs: ['*'] }) in
+      // the namespace.
       kube.Role(rolename) {
         metadata+: rbac_meta {
           namespace: dest_ns,
