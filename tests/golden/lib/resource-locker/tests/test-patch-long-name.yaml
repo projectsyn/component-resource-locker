@@ -30,6 +30,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
+    resourcelocker.syn.tools/cluster-admin: This resource-locker clusterrole grants
+      cluster-admin because it's otherwise impossible to manage clusterrolebindings
+      with unknown role references
     resourcelocker.syn.tools/target-object: rbac.authorization.k8s.io.ClusterRoleBinding/system:build-strategy-docker-binding
   labels:
     app.kubernetes.io/managed-by: commodore
@@ -38,14 +41,11 @@ metadata:
   name: syn-resource-locker-inding-system-build-775295b1777a143-manager
 rules:
   - apiGroups:
-      - rbac.authorization.k8s.io
+      - '*'
     resources:
-      - clusterrolebindings
+      - '*'
     verbs:
-      - get
-      - list
-      - patch
-      - watch
+      - '*'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
