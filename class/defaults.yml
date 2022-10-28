@@ -2,7 +2,7 @@ parameters:
   resource_locker:
     namespace: syn-resource-locker
     charts:
-      resource-locker-operator: v1.1.0
+      resource-locker-operator: v1.1.3
     images:
       resource-locker-operator:
         registry: quay.io
