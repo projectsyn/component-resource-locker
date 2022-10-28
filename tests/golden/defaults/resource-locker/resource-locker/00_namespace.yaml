@@ -4,4 +4,5 @@ metadata:
   annotations: {}
   labels:
     name: syn-resource-locker
+    openshift.io/user-monitoring: 'false'
   name: syn-resource-locker
