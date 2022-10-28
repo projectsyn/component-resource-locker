@@ -4,6 +4,14 @@ local inv = kap.inventory();
 
 local params = inv.parameters.resource_locker;
 
+local namespace = kube.Namespace(params.namespace) {
+  metadata+: {
+    labels+: {
+      'openshift.io/user-monitoring': 'false',
+    },
+  },
+};
+
 local sa = kube.ServiceAccount('delete-operator-deployment') {
   metadata+: {
     annotations+: {
@@ -84,7 +92,6 @@ local upgrade_job = kube.Job('delete-operator-deployment') {
 };
 
 {
-  '00_namespace': kube.Namespace(params.namespace),
-
+  '00_namespace': namespace,
   '10_upgrade_job': [ sa, role, rolebinding, upgrade_job ],
 }
