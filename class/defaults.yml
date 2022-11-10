@@ -12,7 +12,7 @@ parameters:
       kubectl:
         registry: docker.io
         repository: bitnami/kubectl
-        tag: 1.25.3
+        tag: 1.25.4
     helmValues:
       image:
         repository: ${resource_locker:images:resource-locker-operator:registry}/${resource_locker:images:resource-locker-operator:repository}

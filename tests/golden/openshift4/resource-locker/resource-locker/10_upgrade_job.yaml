@@ -86,7 +86,7 @@ spec:
                   fieldPath: metadata.namespace
             - name: NEW_VERSION
               value: v1.1.0
-          image: docker.io/bitnami/kubectl:1.25.3
+          image: docker.io/bitnami/kubectl:1.25.4
           imagePullPolicy: IfNotPresent
           name: delete-deployment
           ports: []
