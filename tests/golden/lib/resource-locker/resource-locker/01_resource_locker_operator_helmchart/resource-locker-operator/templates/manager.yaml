@@ -22,31 +22,31 @@ spec:
         operator: resource-locker-operator
     spec:
       containers:
-      - args:
-        - --leader-elect
-        command:
-        - /manager
-        image: quay.io/redhat-cop/resource-locker-operator:v1.1.0
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8081
-          initialDelaySeconds: 15
-          periodSeconds: 20
-        name: resource-locker-operator
-        ports:
-        - containerPort: 8080
-          name: http
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: 8081
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        resources:
-          requests:
-            cpu: 100m
-            memory: 20Mi
+        - args:
+            - --leader-elect
+          command:
+            - /manager
+          image: quay.io/redhat-cop/resource-locker-operator:v1.1.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          name: resource-locker-operator
+          ports:
+            - containerPort: 8080
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 20Mi
       serviceAccountName: resource-locker-operator-controller-manager
       volumes: []
