@@ -1,3 +1,12 @@
+# ⚠️  Repo Archive Notice
+
+As of Feb 14, 2023, this component will no longer be updated, since the upstream resource-locker-operator has been deprecated for a while now.
+See https://github.com/redhat-cop/resource-locker-operator#deprecation-notice for the deprecation notice for Resource Locker Operator.
+
+We provide component `patch-operator` as a drop-in replacement for component `resource-locker`.
+Component `patch-operator` provides a transitional `resource-locker.libjsonnet` component library to facilitate gradually migrating components which create resource patches to use the new `patch-operator.libsonnet` library directly.
+See the [migration how-to](https://hub.syn.tools/patch-operator/how-tos/migrate-from-resource-locker.html) to learn more.
+
 # Commodore Component: Resource Locker Operator
 
 This is a [Commodore][commodore] Component for Resource Locker Operator.
