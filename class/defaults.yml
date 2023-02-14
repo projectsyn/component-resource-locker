@@ -1,5 +1,8 @@
 parameters:
   resource_locker:
+    =_metadata:
+      deprecated: true
+      replaced_by: patch-operator
     namespace: syn-resource-locker
     charts:
       resource-locker-operator: v1.1.0
